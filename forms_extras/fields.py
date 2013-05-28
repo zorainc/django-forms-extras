@@ -12,6 +12,8 @@ class CommaSeparatedCharField(forms.CharField):
     SEPARATORS_RE = re.compile(r'[,;\s]+')
 
     def clean(self, value):
+        if not isinstance(value, basestring):
+            return value
 
         value = super(CommaSeparatedCharField, self).clean(value)
 
