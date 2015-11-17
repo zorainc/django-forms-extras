@@ -1,6 +1,7 @@
 import re
 
 from django import forms
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from forms_extras.declarative import DeclarativeMultiWidget,\
@@ -14,11 +15,20 @@ class CommaSeparatedCharField(forms.CharField):
     def clean(self, value):
 
         value = super(CommaSeparatedCharField, self).clean(value)
-
+        if isinstance(value, (list, tuple)):
+            return value
         if value:
             return filter(None, self.SEPARATORS_RE.split(value))
         else:
             return []
+
+    def to_python(self, value):
+        "Returns a list or Unicode object."
+        if value in self.empty_values:
+            return ''
+        if isinstance(value, (list, tuple)):
+            return value
+        return smart_text(value, strings_only=True)
 
 
 class NoneBooleanField(forms.BooleanField):
